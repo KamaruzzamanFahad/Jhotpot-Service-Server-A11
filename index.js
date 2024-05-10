@@ -1,12 +1,17 @@
 const express = require('express')
 const app = express()
 const cors = require('cors');
+const cookieparser = require('cookie-parser')
 const port = process.env.PORT|| 5000;
 require('dotenv').config()
 
 // middle wara
-app.use(cors())
+app.use(cors({
+  origin: ['http://localhost:5173'],
+  credentials: true,
+}));
 app.use(express.json());
+app.use(cookieparser())
 
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const uri = `mongodb+srv://${process.env.USER}:${process.env.PASS}@cluster0.otpbube.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
@@ -34,6 +39,30 @@ async function run() {
       const result = await servicecollection.insertOne(data);
       res.send(result)
     })
+
+
+
+
+
+
+
+
+
+
+
+
+    //authreleted api
+    app.post('/jwt', async(req,res) => {
+      const email = req.body;
+      const token = jwt.sign(email,process.env.ASSES_TOKEN_SECRET,{expiresIn: '1h'})
+      res.cookie('assestoken',token,{
+          httpOnly: true,
+          secure: false,
+          sameSite: 'none',
+      }).send({succes: true,})
+     })
+
+     
 
 
 
