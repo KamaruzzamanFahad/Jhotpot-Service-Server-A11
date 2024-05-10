@@ -54,7 +54,7 @@ async function run() {
     //authreleted api
     app.post('/jwt', async(req,res) => {
       const email = req.body;
-      const token = jwt.sign(email,process.env.ASSES_TOKEN_SECRET,{expiresIn: '1h'})
+      const token = jwt.sign(email,process.env.ASSES_TOKEN_SECRET,{expiresIn: '24h'})
       res.cookie('assestoken',token,{
           httpOnly: true,
           secure: false,
@@ -62,7 +62,13 @@ async function run() {
       }).send({succes: true,})
      })
 
-     
+
+     app.post('/logout', async (req,res) =>{
+      user = req.body;
+      res.clearCookie('assestoken',{maxAge: 0,}).send({succes: true,})
+     })
+
+
 
 
 
