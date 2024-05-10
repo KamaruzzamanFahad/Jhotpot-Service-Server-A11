@@ -68,6 +68,11 @@ async function run() {
       res.send('working')
     })
 
+    app.get('/Services', verifytoken, async(req,res) =>{
+      const result = await servicecollection.find().toArray();
+      res.send(result)
+    })
+
 
 
 
