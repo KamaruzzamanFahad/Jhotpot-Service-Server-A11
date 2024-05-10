@@ -1,7 +1,12 @@
 const express = require('express')
 const app = express()
+const cors = require('cors');
 const port = process.env.PORT|| 5000;
 require('dotenv').config()
+
+// middle wara
+app.use(cors())
+app.use(express.json());
 
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const uri = `mongodb+srv://${process.env.USER}:${process.env.PASS}@cluster0.otpbube.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
@@ -18,7 +23,31 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
+    const database = client.db('Jhotpot');
+    const servicecollection = database.collection('Service');
+
+
+
+    app.post('/AddService', async(req,res)=>{
+      const data = req.body;
+      const result = await servicecollection.insertOne(data);
+      res.send(result)
+    })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
