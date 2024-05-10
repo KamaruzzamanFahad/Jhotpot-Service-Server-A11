@@ -1,8 +1,9 @@
 const express = require('express')
 const app = express()
 const cors = require('cors');
+const jwt = require('jsonwebtoken');
 const cookieparser = require('cookie-parser')
-const port = process.env.PORT|| 5000;
+const port = process.env.PORT || 5000;
 require('dotenv').config()
 
 // middle wara
@@ -25,6 +26,25 @@ const client = new MongoClient(uri, {
   }
 });
 
+
+//won make middleware
+
+const verifytoken = async (req, res, next) => {
+  const token = req.cookies?.assestoken;
+  if (!token) {
+    return res.status(401).send({ 'message': 'not autorize' })
+  }
+  jwt.verify(token, process.env.ASSES_TOKEN_SECRET, (err, decoded) => {
+    if (err) {
+      return res.status(401).send({ massage: 'unauthorize' })
+    }
+    req.user = decoded;
+    next()
+  })
+
+}
+
+
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
@@ -34,10 +54,18 @@ async function run() {
 
 
 
-    app.post('/AddService', async(req,res)=>{
+    app.post('/AddService', verifytoken, async (req, res) => {
       const data = req.body;
       const result = await servicecollection.insertOne(data);
+      if (req.user.email !== data.email) {
+        res.status(401).send({ massage: 'forbidden acces' })
+      }
       res.send(result)
+    })
+
+    app.get('/test', verifytoken, async (req, res) => {
+      console.log('geted')
+      res.send('working')
     })
 
 
@@ -52,21 +80,23 @@ async function run() {
 
 
     //authreleted api
-    app.post('/jwt', async(req,res) => {
+    app.post('/jwt', async (req, res) => {
       const email = req.body;
-      const token = jwt.sign(email,process.env.ASSES_TOKEN_SECRET,{expiresIn: '24h'})
-      res.cookie('assestoken',token,{
-          httpOnly: true,
-          secure: false,
-          sameSite: 'none',
-      }).send({succes: true,})
-     })
+      const token = jwt.sign(email, process.env.ASSES_TOKEN_SECRET, { expiresIn: '1h' })
+      res.cookie('assestoken', token, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+      }).send({ succes: true, })
+    })
 
 
-     app.post('/logout', async (req,res) =>{
+    app.post('/logout', async (req, res) => {
       user = req.body;
-      res.clearCookie('assestoken',{maxAge: 0,}).send({succes: true,})
-     })
+      res.clearCookie('assestoken', { maxAge: 0, }).send({ succes: true, })
+    })
+
+
 
 
 
@@ -96,10 +126,10 @@ run().catch(console.dir);
 
 
 
-app.get('/',(req,res) =>{
-    res.send('server is running')
+app.get('/', (req, res) => {
+  res.send('server is running')
 })
 
-app.listen(port, ()=>{
-    console.log('server is running port:',port)
+app.listen(port, () => {
+  console.log('server is running port:', port)
 })
