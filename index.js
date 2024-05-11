@@ -140,6 +140,17 @@ async function run() {
       res.send(result);
     })
 
+    app.get('/servicetodo', verifytoken, async(req,res) => {
+      const email = req.query.email;
+      console.log(email)
+      const quary = {providerEmail: email};
+      const result = await purchasecollection.find(quary).toArray();
+      if(req.user.email !== email){
+        res.status(400).send({massage: 'forbidden acces'})
+      }
+      res.send(result);
+    })
+
 
 
 
