@@ -75,7 +75,7 @@ async function run() {
       res.send('working')
     })
 
-    app.get('/Services', verifytoken, async (req, res) => {
+    app.get('/Services', async (req, res) => {
       const result = await servicecollection.find().toArray();
       res.send(result)
     })
@@ -84,7 +84,16 @@ async function run() {
       const id = req.params.id;
       const quary = { _id: new ObjectId(id) };
       const result = await servicecollection.findOne(quary);
-      console.log(id)
+      res.send(result)
+    })
+
+    app.get('/myservice', verifytoken, async(req,res) =>{
+      const email = req.query.email;
+      const quary = {email: email};
+      const result = await servicecollection.find(quary).toArray();
+      if(req.user.email !== email){
+        res.status(400).send({massage: 'forbiddin acces'})
+      }
       res.send(result)
     })
 
