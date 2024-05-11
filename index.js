@@ -51,6 +51,7 @@ async function run() {
     // await client.connect();
     const database = client.db('Jhotpot');
     const servicecollection = database.collection('Service');
+    const purchasecollection = database.collection('Purchase');
 
 
 
@@ -63,22 +64,31 @@ async function run() {
       res.send(result)
     })
 
+    app.post('/addpurchase', verifytoken, async (req,res) => {
+      const doc = req.body;
+      const result = await purchasecollection.insertOne(doc);
+      res.send(result);
+    })
+
     app.get('/test', verifytoken, async (req, res) => {
       console.log('geted')
       res.send('working')
     })
 
-    app.get('/Services', verifytoken, async(req,res) =>{
+    app.get('/Services', verifytoken, async (req, res) => {
       const result = await servicecollection.find().toArray();
       res.send(result)
     })
 
-    app.get('/services/:id',async(req,res)=>{
+    app.get('/services/:id', verifytoken, async (req, res) => {
       const id = req.params.id;
-      const quary = {_id: new ObjectId(id)};
+      const quary = { _id: new ObjectId(id) };
       const result = await servicecollection.findOne(quary);
+      console.log(id)
       res.send(result)
     })
+
+
 
 
 
