@@ -64,7 +64,7 @@ async function run() {
       res.send(result)
     })
 
-    app.post('/addpurchase', verifytoken, async (req,res) => {
+    app.post('/addpurchase', verifytoken, async (req, res) => {
       const doc = req.body;
       const result = await purchasecollection.insertOne(doc);
       res.send(result);
@@ -87,13 +87,45 @@ async function run() {
       res.send(result)
     })
 
-    app.get('/myservice', verifytoken, async(req,res) =>{
+    app.get('/myservice', verifytoken, async (req, res) => {
       const email = req.query.email;
-      const quary = {email: email};
+      const quary = { email: email };
       const result = await servicecollection.find(quary).toArray();
-      if(req.user.email !== email){
-        res.status(400).send({massage: 'forbiddin acces'})
+      if (req.user.email !== email) {
+        res.status(400).send({ massage: 'forbiddin acces' })
       }
+      res.send(result)
+    })
+
+    app.delete('/delete/:id', verifytoken, async (req, res) => {
+      const id = req.params.id;
+      const quary = { _id: new ObjectId(id) };
+      const result = await servicecollection.deleteOne(quary);
+      res.send(result)
+    })
+
+    app.put('/updateservice/:id', verifytoken, async (req, res) => {
+      const id = req.params.id;
+      const quary = { _id: new ObjectId(id) };
+      const doc = req.body;
+      const option = { upsert: true };
+      const updatedoc = {
+        $set: {
+          name: doc.name,
+          price: doc.price,
+          detils: doc.detils,
+          image: doc.image,
+          area: doc.area,
+          username: doc.username,
+          email: doc.email,
+          userimage: doc.userimage,
+        }
+      }
+      const result = await servicecollection.updateOne(quary,updatedoc,option);
+      if(req.user.email !== doc.email){
+        res.status(400).send({massage: 'unauthorize'})
+      }
+      console.log(doc.area)
       res.send(result)
     })
 
