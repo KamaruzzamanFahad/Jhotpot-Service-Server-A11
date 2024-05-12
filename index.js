@@ -8,7 +8,7 @@ require('dotenv').config()
 
 // middle wara
 app.use(cors({
-  origin: ['http://localhost:5173'],
+  origin: ['http://localhost:5173','https://jotpotservice-95ce1.web.app/','https://jotpotservice-95ce1.firebaseapp.com/'],
   credentials: true,
 }));
 app.use(express.json());
@@ -79,6 +79,13 @@ async function run() {
       const result = await servicecollection.find().toArray();
       res.send(result)
     })
+
+    app.get('/Servicessix', async (req, res) => {
+      const limit = 6;
+      const result = await servicecollection.find().limit(limit).toArray();
+      res.send(result)
+    })
+
 
     app.get('/Servicessearch', async (req, res) => {
       const text = req.query.text;
@@ -185,8 +192,8 @@ async function run() {
       const token = jwt.sign(email, process.env.ASSES_TOKEN_SECRET, { expiresIn: '1h' })
       res.cookie('assestoken', token, {
         httpOnly: true,
-        secure: true,
-        sameSite: 'none',
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
       }).send({ succes: true, })
     })
 
@@ -207,14 +214,8 @@ async function run() {
 
 
 
-
-
-
-
-
-
     // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
+    // await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
     // Ensures that the client will close when you finish/error
