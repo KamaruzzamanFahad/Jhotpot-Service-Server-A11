@@ -80,6 +80,13 @@ async function run() {
       res.send(result)
     })
 
+    app.get('/Servicessearch', async (req, res) => {
+      const text = req.query.text;
+      const quary = {name: {$regex: new RegExp(text, 'i') }};
+      const result = await servicecollection.find(quary).toArray();
+      res.send(result)
+    })
+
     app.get('/services/:id', verifytoken, async (req, res) => {
       const id = req.params.id;
       const quary = { _id: new ObjectId(id) };
