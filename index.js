@@ -142,13 +142,20 @@ async function run() {
 
     app.get('/servicetodo', verifytoken, async(req,res) => {
       const email = req.query.email;
-      console.log(email)
       const quary = {providerEmail: email};
       const result = await purchasecollection.find(quary).toArray();
       if(req.user.email !== email){
         res.status(400).send({massage: 'forbidden acces'})
       }
       res.send(result);
+    })
+
+    app.patch('/updatestatus/:id',verifytoken, async(req,res)=> {
+      const doc = req.body;
+      const id = req.params.id;
+      const query = {_id: new ObjectId(id)};
+      const result =await purchasecollection.updateOne(query,{$set: doc});
+      res.send(result)
     })
 
 
