@@ -8,7 +8,7 @@ require('dotenv').config()
 
 // middle wara
 app.use(cors({
-  origin: ['http://localhost:5173','https://jotpotservice-95ce1.web.app/','https://jotpotservice-95ce1.firebaseapp.com/'],
+  origin: ['http://localhost:5173','https://jotpotservice-95ce1.web.app','https://jotpotservice-95ce1.firebaseapp.com'],
   credentials: true,
 }));
 app.use(express.json());
